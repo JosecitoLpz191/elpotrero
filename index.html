@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#172a22"><meta name="description" content="Administración de ganado, salud y finanzas del rancho, disponible sin conexión.">
+<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png"><link rel="icon" href="icons/icon.svg"><link rel="stylesheet" href="styles.css">
+<title> El Potrero</title>
+</head>
+<body>
+<div class="app">
+<header class="topbar">
+ <div class="brand"><div class="brand-icon">RG</div><div><p class="eyebrow">ADMINISTRACIÓN DEL RANCHO</p><h1>El Potrero</h1></div></div>
+ <div id="connection" class="connection"><i></i><span>Preparando…</span></div>
+</header>
+<main>
+<section class="hero"><div><p class="eyebrow">TODO TU RANCHO, EN UN LUGAR</p><h2>Tu ganado.<br>Tu control.</h2><p>Información importante, incluso sin señal.</p></div><div class="hero-cow" aria-hidden="true">🐄</div></section>
+<section class="stats">
+ <article class="stat"><span class="stat-symbol">🐄</span><div><span>Animales activos</span><strong id="stat-animals">0</strong></div></article>
+ <article class="stat"><span class="stat-symbol">🩺</span><div><span>Tratamientos pendientes</span><strong id="stat-health">0</strong></div></article>
+ <article class="stat"><span class="stat-symbol">↗</span><div><span>Balance registrado</span><strong id="stat-balance">$0</strong></div></article>
+</section>
+<nav class="tabs" aria-label="Secciones">
+<button class="tab active" data-page="dashboard">Resumen</button><button class="tab" data-page="animals">Ganado</button><button class="tab" data-page="health">Salud</button><button class="tab" data-page="money">Finanzas</button>
+</nav>
+<section id="page-dashboard" class="page">
+ <div class="section-title"><div><p class="eyebrow">VISTA GENERAL</p><h2>Resumen del rancho</h2></div><button class="btn primary" id="quick-add">＋ Registrar</button></div>
+ <div class="shortcut-grid">
+  <button class="shortcut" data-go="animals"><span>🐄</span><b>Registrar animal</b><small>Arete, raza, nacimiento…</small></button>
+  <button class="shortcut" data-go="health"><span>🩺</span><b>Registrar salud</b><small>Vacunas y tratamientos</small></button>
+  <button class="shortcut" data-go="money"><span>💵</span><b>Registrar movimiento</b><small>Gastos e ingresos</small></button>
+ </div>
+ <div class="section-title compact"><div><p class="eyebrow">ACTIVIDAD RECIENTE</p><h2>Últimos registros</h2></div></div>
+ <div id="recent-list" class="record-list"></div>
+ <div class="notice"><span>ⓘ</span><p><b>Datos guardados en este dispositivo.</b><br>Haz respaldos periódicos desde la sección Finanzas. Esta versión no sincroniza información entre teléfonos.</p></div>
+</section>
+<section id="page-animals" class="page hidden">
+ <div class="section-title"><div><p class="eyebrow">INVENTARIO</p><h2>Mi ganado</h2></div><button class="btn primary" id="add-animal">＋ Animal</button></div>
+ <div class="filters"><label class="search">⌕ <input id="animal-search" placeholder="Buscar por arete, apodo o raza…"></label><select id="animal-status" aria-label="Estado"><option value="all">Todos</option><option value="Activo">Activos</option><option value="Vendido">Vendidos</option><option value="Fallecido">Fallecidos</option></select></div>
+ <div id="animal-list" class="animal-grid"></div>
+ <div id="animals-empty" class="empty hidden"><span>🐄</span><h3>Empieza tu inventario</h3><p>Registra tu primera vaca para crear su ficha individual.</p><button class="btn primary" id="empty-animal">Registrar animal</button></div>
+</section>
+<section id="page-health" class="page hidden">
+ <div class="section-title"><div><p class="eyebrow">CONTROL SANITARIO</p><h2>Salud del ganado</h2></div><button class="btn primary" id="add-health">＋ Registro</button></div>
+ <div class="filters"><label class="search">⌕ <input id="health-search" placeholder="Buscar animal o tratamiento…"></label><select id="health-filter" aria-label="Filtrar salud"><option value="all">Todos</option><option value="pending">Pendientes</option><option value="done">Realizados</option></select></div>
+ <div id="health-list" class="record-list"></div>
+ <div id="health-empty" class="empty hidden"><span>🩺</span><h3>Sin registros sanitarios</h3><p>Añade vacunas, enfermedades, medicamentos o revisiones.</p></div>
+</section>
+<section id="page-money" class="page hidden">
+ <div class="section-title"><div><p class="eyebrow">CONTROL ECONÓMICO</p><h2>Finanzas del rancho</h2></div><button class="btn primary" id="add-money">＋ Movimiento</button></div>
+ <div class="money-summary"><article><span>Ingresos</span><strong id="total-income">$0</strong></article><article><span>Gastos</span><strong id="total-expense">$0</strong></article><article><span>Balance</span><strong id="total-net">$0</strong></article></div>
+ <div class="filters"><label class="search">⌕ <input id="money-search" placeholder="Buscar concepto…"></label><select id="money-filter" aria-label="Tipo"><option value="all">Todos</option><option value="Ingreso">Ingresos</option><option value="Gasto">Gastos</option></select></div>
+ <div id="money-list" class="record-list"></div>
+ <div id="money-empty" class="empty hidden"><span>💵</span><h3>Sin movimientos</h3><p>Registra gastos e ingresos para conocer el balance.</p></div>
+ <div class="backup-panel"><div><b>Respaldo de datos</b><p>Exporta el inventario, salud y finanzas a un archivo que puedes guardar en otro lugar.</p></div><div class="backup-actions"><button id="export-data" class="btn secondary">Exportar respaldo</button><button id="import-data" class="btn secondary">Importar respaldo</button><input id="import-file" type="file" accept=".json,application/json" hidden></div></div>
+</section>
+</main>
+<nav class="bottom-nav" aria-label="Navegación inferior">
+<button class="bottom-item active" data-page="dashboard"><span>⌂</span><small>Resumen</small></button><button class="bottom-item" data-page="animals"><span>🐄</span><small>Ganado</small></button><button class="bottom-item" data-page="health"><span>♡</span><small>Salud</small></button><button class="bottom-item" data-page="money"><span>$</span><small>Finanzas</small></button>
+</nav>
+</div>
+
+<dialog id="animal-dialog">
+<form id="animal-form">
+<div class="dialog-head"><div><p class="eyebrow">FICHA INDIVIDUAL</p><h2 id="animal-dialog-title">Registrar animal</h2></div><button type="button" class="close" data-close="animal-dialog">×</button></div>
+<div class="form-grid">
+<label>Número de arete *<input id="a-tag" required maxlength="60" placeholder="Ej. 024"></label>
+<label>Apodo<input id="a-name" maxlength="80" placeholder="Ej. Lucera"></label>
+<label>Raza<input id="a-breed" maxlength="80" placeholder="Ej. Angus, Charolais…"></label>
+<label>Color<input id="a-color" maxlength="60" placeholder="Ej. Café con blanco"></label>
+<label>Fecha de nacimiento<input id="a-birth" type="date"></label>
+<label>Sexo<select id="a-sex"><option>Hembra</option><option>Macho</option></select></label>
+<label>Estado<select id="a-status"><option>Activo</option><option>Vendido</option><option>Fallecido</option></select></label>
+<label>Peso (kg)<input id="a-weight" type="number" min="0" step="0.1" placeholder="Opcional"></label>
+<label>Madre<select id="a-mother"><option value="">No registrada / desconocida</option></select></label>
+<label>Padre (arete o nombre)<input id="a-father" maxlength="100" placeholder="Opcional"></label>
+<label class="full">Foto del animal<input id="a-photo" type="file" accept="image/*"></label>
+<label class="full">Observaciones<textarea id="a-notes" rows="3" placeholder="Señas particulares, procedencia…"></textarea></label>
+</div>
+<div class="form-actions"><button type="button" class="btn secondary" data-close="animal-dialog">Cancelar</button><button class="btn primary" type="submit">Guardar ficha</button></div>
+</form>
+</dialog>
+
+<dialog id="animal-detail-dialog">
+<div class="dialog-head"><div><p class="eyebrow">FICHA DEL ANIMAL</p><h2 id="detail-animal-title"></h2></div><button type="button" class="close" data-close="animal-detail-dialog">×</button></div>
+<div id="animal-detail-content"></div>
+<div class="form-actions"><button class="btn danger" id="delete-animal">Eliminar ficha</button><button class="btn secondary" id="edit-animal">Editar</button><button class="btn primary" id="detail-add-health">＋ Salud</button></div>
+</dialog>
+
+<dialog id="health-dialog">
+<form id="health-form">
+<div class="dialog-head"><div><p class="eyebrow">CONTROL SANITARIO</p><h2>Nuevo registro de salud</h2></div><button type="button" class="close" data-close="health-dialog">×</button></div>
+<div class="form-grid">
+<label class="full">Animal *<select id="h-animal" required></select></label>
+<label>Tipo<select id="h-type"><option>Vacuna</option><option>Desparasitación</option><option>Enfermedad</option><option>Medicamento</option><option>Revisión veterinaria</option><option>Otro</option></select></label>
+<label>Fecha *<input id="h-date" type="date" required></label>
+<label class="full">Producto, diagnóstico o tratamiento *<input id="h-title" required maxlength="120" placeholder="Ej. Vacuna clostridial"></label>
+<label>Dosis / cantidad<input id="h-dose" maxlength="80" placeholder="Según indicación veterinaria"></label>
+<label>Próxima fecha<input id="h-next" type="date"></label>
+<label>Estado<select id="h-status"><option>Pendiente</option><option>Realizado</option></select></label>
+<label>Costo (MXN)<input id="h-cost" type="number" min="0" step="0.01" placeholder="0.00"></label>
+<label class="full">Notas<textarea id="h-notes" rows="3" placeholder="Lote, reacción, indicaciones…"></textarea></label>
+</div>
+<div class="form-actions"><button type="button" class="btn secondary" data-close="health-dialog">Cancelar</button><button class="btn primary" type="submit">Guardar registro</button></div>
+</form>
+</dialog>
+
+<dialog id="money-dialog">
+<form id="money-form">
+<div class="dialog-head"><div><p class="eyebrow">MOVIMIENTO ECONÓMICO</p><h2>Registrar movimiento</h2></div><button type="button" class="close" data-close="money-dialog">×</button></div>
+<div class="form-grid">
+<label>Tipo<select id="m-type"><option>Gasto</option><option>Ingreso</option></select></label>
+<label>Fecha *<input id="m-date" type="date" required></label>
+<label class="full">Concepto *<input id="m-title" required maxlength="120" placeholder="Ej. Compra de alimento"></label>
+<label>Categoría<select id="m-category"><option>Alimento</option><option>Veterinario</option><option>Vacunas y medicamentos</option><option>Compra de ganado</option><option>Venta de ganado</option><option>Mano de obra</option><option>Transporte</option><option>Mantenimiento</option><option>Otros</option></select></label>
+<label>Monto (MXN) *<input id="m-amount" required type="number" min="0.01" step="0.01" placeholder="0.00"></label>
+<label class="full">Animal relacionado (opcional)<select id="m-animal"><option value="">Ninguno</option></select></label>
+<label class="full">Notas<textarea id="m-notes" rows="3" placeholder="Proveedor, comprobante, detalles…"></textarea></label>
+</div>
+<div class="form-actions"><button type="button" class="btn secondary" data-close="money-dialog">Cancelar</button><button class="btn primary" type="submit">Guardar movimiento</button></div>
+</form>
+</dialog>
+<div id="toast" role="status" aria-live="polite"></div>
+<script src="app.js"></script>
+</body></html>
